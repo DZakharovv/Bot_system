@@ -1,55 +1,58 @@
 import time
 import logging
+import config
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher.filters import Text
 
 logging.basicConfig(level=logging.INFO)
 
-TOKEN = "5572620592:AAHMnYrYZ3DEkT1mxG6sKa9ctz9zW66Ms30"
-MSG = "Are you here?"
-
-bot = Bot(token=TOKEN)
+bot = Bot(token=config.TOKEN)
 dp = Dispatcher(bot=bot)
 
 
-# @dp.message_handler(commands=['start'])
-# async def start_handler(message: types.Message):
-#     user_id = message.from_user.id
-#     user_name = message.from_user.first_name
-#     user_full_name = message.from_user.full_name
-#     logging.info(f'{user_id=} {user_full_name=} {time.asctime()}')
-#     await message.reply(f"Привет, {user_full_name}!")
-#
-#     for i in range(10):
-#         time.sleep(60)
-#         await bot.send_message(user_id, MSG.format(user_name))
-
 @dp.message_handler(commands=['start'])
 async def start_cmd_handler(message: types.Message):
-    keyboard_markup = types.InlineKeyboardMarkup(row_width=4)
+    keyboard_markup = types.InlineKeyboardMarkup(row_width=3)
     text_and_data = (
-        ('help', 'help'),
-        ('help2', 'help'),
-        ('help3', 'help'),
-        ('help4', 'help'),
-        ('help5', 'help'),
-        ('help6', 'help'),
-        ('help7', 'help'),
-        ('help8', 'help'),
-        ('help9', 'help'),
+        ('Помощь', 'help'),
+        ('ID', 'id'),
+        ('test', 'test'),
+        ('В сети', 'users_online'),
+        ('Чайник', 'kettle_on'),
+        ('Шутка', 'joke'),
+        ('Мониторинг', 'moncam'),
+        ('Бук', 'bookcam'),
     )
     row_btns = (types.InlineKeyboardButton(text, callback_data=data) for text, data in text_and_data)
 
     keyboard_markup.add(*row_btns)
-    # keyboard_markup.add(*row_btns_2)
 
-    await message.reply("Hi!\nDo you love aiogram?", reply_markup=keyboard_markup)
+    await bot.send_message(chat_id=message.from_user.id,text="Привет!\nЧего надобно, старче?", reply_markup=keyboard_markup)
 
 
-@dp.callback_query_handler(text='no')
-@dp.callback_query_handler(text='yes')
+@dp.callback_query_handler(text='id')
+@dp.callback_query_handler(text='test')
 @dp.callback_query_handler(text='help')
+@dp.callback_query_handler(text='users_online')
+@dp.callback_query_handler(text='joke')
+@dp.callback_query_handler(text='moncam')
+@dp.callback_query_handler(text='bookcam')
+
+@dp.callback_query_handler(text=['kettle_on'])
+async def start_kettle_handler(query: types.CallbackQuery):
+    keyboard_markup = types.InlineKeyboardMarkup(row_width=2)
+    text_and_data = (
+        ('Включить', 'on'),
+        ('Температура', 'tmp'),
+        ('В меню', 'on_menu'),
+    )
+    row_btns = (types.InlineKeyboardButton(text, callback_data=data) for text, data in text_and_data)
+    keyboard_markup.add(*row_btns)
+    # await message.text("Чайник готов", reply_markup=keyboard_markup)
+    await bot.send_message(query.from_user.id, reply_markup=keyboard_markup)
+
+
 async def inline_kb_answer_callback_handler(query: types.CallbackQuery):
     answer_data = query.data
     await query.answer(f'You answered with {answer_data!r}')
