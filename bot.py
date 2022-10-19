@@ -28,18 +28,14 @@ async def start_cmd_handler(message: types.Message):
 
     keyboard_markup.add(*row_btns)
 
-    await bot.send_message(chat_id=message.from_user.id,text="Привет!\nЧего надобно, старче?", reply_markup=keyboard_markup)
+    await bot.send_message(chat_id=message.from_user.id, text="Привет!\nЧего надобно, старче?",
+                           reply_markup=keyboard_markup)
 
 
-@dp.callback_query_handler(text='id')
-@dp.callback_query_handler(text='test')
-@dp.callback_query_handler(text='help')
-@dp.callback_query_handler(text='users_online')
-@dp.callback_query_handler(text='joke')
-@dp.callback_query_handler(text='moncam')
-@dp.callback_query_handler(text='bookcam')
 
-@dp.callback_query_handler(text=['kettle_on'])
+@dp.callback_query_handler(text='kettle_on')
+
+
 async def start_kettle_handler(query: types.CallbackQuery):
     keyboard_markup = types.InlineKeyboardMarkup(row_width=2)
     text_and_data = (
@@ -49,8 +45,20 @@ async def start_kettle_handler(query: types.CallbackQuery):
     )
     row_btns = (types.InlineKeyboardButton(text, callback_data=data) for text, data in text_and_data)
     keyboard_markup.add(*row_btns)
-    # await message.text("Чайник готов", reply_markup=keyboard_markup)
-    await bot.send_message(query.from_user.id, reply_markup=keyboard_markup)
+    await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text="Чайник готов")
+    await bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=keyboard_markup)
+
+@dp.callback_query_handler(text='id')
+@dp.callback_query_handler(text='test')
+@dp.callback_query_handler(text='help')
+@dp.callback_query_handler(text='users_online')
+@dp.callback_query_handler(text='joke')
+@dp.callback_query_handler(text='moncam')
+@dp.callback_query_handler(text='bookcam')
+
+@dp.callback_query_handler(text='on_menu')
+
+async def menu(query: types.CallbackQuery):
 
 
 async def inline_kb_answer_callback_handler(query: types.CallbackQuery):
