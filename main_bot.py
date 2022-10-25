@@ -86,7 +86,7 @@ async def start_kettle_on_handler(query: types.CallbackQuery):
         await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id,
                                     text="Пробую включить...")
 
-        run_command('/bin/bash /root/telegram-bot/bot/kettle.sh %(name)s' % {'name': query.message.chat_id})
+        run_command('/bin/bash /root/telegram-bot/bot/kettle.sh %(name)s' % {'name': query.message.chat.id})
         await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id,
                                     text=textoutput)
         keyboard_markup = types.InlineKeyboardMarkup(row_width=2)
@@ -226,10 +226,11 @@ async def joke(query: types.CallbackQuery):
 
 @dp.callback_query_handler(text='moncam')
 async def monitoring_camera(query: types.CallbackQuery):
-    # await bot.send_message(chat_id=query.from_user.id, text="Камера не подключена")
+    await bot.send_message(chat_id=query.from_user.id, text="Подключаюсь...")
+
     run_command('/bin/bash /root/telegram-bot/bot/moncam.sh')
     # await asyncio.sleep(5)
-    bot.send_photo(chat_id=query.from_user.id, photo=open('/root/telegram-bot/bot/Img/moncam/image.jpg', 'rb'))
+    await bot.send_photo(chat_id=query.from_user.id, photo=open('/root/telegram-bot/bot/Img/moncam/image.jpg', 'rb'))
     await bot.delete_message(chat_id=query.from_user.id, message_id=query.message.message_id)
     keyboard_markup = types.InlineKeyboardMarkup(row_width=2)
     text_and_data = (
@@ -244,7 +245,26 @@ async def monitoring_camera(query: types.CallbackQuery):
     await bot.send_message(chat_id=query.from_user.id, text="Меню камер:", reply_markup=keyboard_markup)
 
 
-# @dp.callback_query_handler(text='bookcam')
+@dp.callback_query_handler(text='bookcam')
+async def book_camera(query: types.CallbackQuery):
+    await bot.send_message(chat_id=query.from_user.id, text="Подключаюсь...")
+
+    run_command('/bin/bash /root/telegram-bot/bot/bookcam.sh')
+    bot.send_photo(chat_id=query.from_user.id, photo=open('/root/telegram-bot/bot/Img/bookcam/image.jpg', 'rb'))
+    await bot.delete_message(chat_id=query.from_user.id, message_id=query.message.message_id)
+    keyboard_markup = types.InlineKeyboardMarkup(row_width=2)
+    text_and_data = (
+        ('Мониторинг', 'moncam'),
+        ('Бук', 'bookcam'),
+        ('В меню', 'on_menu'),
+    )
+    row_btns = (types.InlineKeyboardButton(text, callback_data=data) for text, data in text_and_data)
+
+    keyboard_markup.add(*row_btns)
+
+    await bot.send_message(chat_id=query.from_user.id, text="Меню камер:", reply_markup=keyboard_markup)
+
+
 @dp.callback_query_handler(text='cams')
 async def cams_func(query: types.CallbackQuery):
     keyboard_markup = types.InlineKeyboardMarkup(row_width=2)
